@@ -1,11 +1,17 @@
 package org.example.scaler_e_commerce.controllers;
 
 import org.example.scaler_e_commerce.dtos.ProductDto;
+import org.example.scaler_e_commerce.services.ProductService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
+    private ProductService productService;
+
+    ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
 
     @GetMapping()
