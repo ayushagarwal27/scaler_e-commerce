@@ -15,28 +15,31 @@ public class ProductController {
 
 
     @GetMapping()
-    public String getAllProducts() {
-        return "All products got!";
+    public ProductDto[] getAllProducts() {
+        ProductDto[] products = productService.getAllProducts();
+        return products;
     }
 
     @GetMapping("/{productID}")
-    public String getSingleProduct(@PathVariable("productID") Long productID) {
-        return "Getting details of product with ID: " + productID;
+    public ProductDto getSingleProduct(@PathVariable("productID") Long productID) {
+        ProductDto product = productService.getSingleProduct(productID);
+        return product;
     }
 
     @PostMapping()
-    public String addSingleProduct(@RequestBody ProductDto productDto) {
-        return "Adding product" + productDto;
+    public ProductDto addSingleProduct(@RequestBody ProductDto productDto) {
+        ProductDto product = productService.addSingleProduct(productDto);
+        return product;
     }
 
 
     @PutMapping("/{productID}")
     public String updateSingleProduct(@PathVariable("productID") Long productID, @RequestBody ProductDto productDto) {
-        return "Updating product with ID: " + productID + " " + productDto;
+        return productService.updateSingleProduct(productID, productDto);
     }
 
     @DeleteMapping("/{productID}")
     public String deleteSingleProduct(@PathVariable("productID") Long productID) {
-        return "Deleting product with given ID: " + productID;
+        return productService.deleteSingleProduct(productID);
     }
 }

@@ -3,11 +3,11 @@ package org.example.scaler_e_commerce.services;
 import org.example.scaler_e_commerce.dtos.ProductDto;
 
 public interface ProductService {
-    String getAllProducts();
+    ProductDto[] getAllProducts();
 
-    String getSingleProduct(Long productID);
+    ProductDto getSingleProduct(Long productID);
 
-    String addSingleProduct(ProductDto productDto);
+    ProductDto addSingleProduct(ProductDto productDto);
 
     String updateSingleProduct(Long productID, ProductDto productDto);
 

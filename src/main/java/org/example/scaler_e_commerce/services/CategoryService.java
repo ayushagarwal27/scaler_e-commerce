@@ -1,7 +1,9 @@
 package org.example.scaler_e_commerce.services;
 
-public interface CategoryService {
-    String getAllCategories();
+import org.example.scaler_e_commerce.dtos.ProductDto;
 
-    String getAllProductsByCategory(Long categoryID);
+public interface CategoryService {
+    String[] getAllCategories();
+
+    ProductDto[] getAllProductsByCategory(String categoryName);
 }
