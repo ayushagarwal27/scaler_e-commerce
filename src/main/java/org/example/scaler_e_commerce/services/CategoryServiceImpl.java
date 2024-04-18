@@ -1,22 +1,59 @@
 package org.example.scaler_e_commerce.services;
 
 import org.example.scaler_e_commerce.dtos.ProductDto;
+import org.example.scaler_e_commerce.models.Category;
+import org.example.scaler_e_commerce.models.Product;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
-    private final RestTemplate template = new RestTemplate();
+    private final RestTemplateBuilder templateBuilder;
 
-    @Override
-    public String[] getAllCategories() {
-        String[] categories = template.getForObject("https://fakestoreapi.com/products/categories", String[].class);
-        return categories;
+    CategoryServiceImpl(RestTemplateBuilder templateBuilder) {
+        this.templateBuilder = new RestTemplateBuilder();
+    }
+
+    private Category convertResponseCategoryToCategoryModel(String cate) {
+        Category category = new Category();
+        category.setName(cate);
+        return category;
+    }
+
+    private Product convertProductDtoToProductModel(ProductDto productDto) {
+        Product product = new Product();
+        product.setId(productDto.getId());
+        product.setTitle(productDto.getTitle());
+        product.setDescription(productDto.getDescription());
+        product.setPrice(productDto.getPrice());
+        product.setImageUrl(productDto.getImage());
+        Category category = new Category();
+        category.setName(productDto.getCategory());
+        product.setCategory(category);
+        return product;
     }
 
     @Override
-    public ProductDto[] getAllProductsByCategory(String categoryName) {
-        ProductDto[] products = template.getForObject("https://fakestoreapi.com/products/category/" + categoryName, ProductDto[].class);
-        return products;
+    public List<Category> getAllCategories() {
+        ResponseEntity<String[]> categoriesResponse = templateBuilder.build().getForEntity("https://fakestoreapi.com/products/categories", String[].class);
+        List<Category> categoryList = new ArrayList<>();
+        for (String cate : categoriesResponse.getBody()) {
+            categoryList.add(convertResponseCategoryToCategoryModel(cate));
+        }
+        return categoryList;
+    }
+
+    @Override
+    public List<Product> getAllProductsByCategory(String categoryName) {
+        ResponseEntity<ProductDto[]> productResponse = templateBuilder.build().getForEntity("https://fakestoreapi.com/products/category/{categoryName}", ProductDto[].class, categoryName);
+        List<Product> productList = new ArrayList<>();
+        for (ProductDto pr : productResponse.getBody()) {
+            productList.add(convertProductDtoToProductModel(pr));
+        }
+        return productList;
     }
 }

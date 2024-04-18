@@ -20,13 +20,12 @@ import java.util.List;
 @Service
 public class ProductServiceImpl implements ProductService {
     private final RestTemplateBuilder restTemplateBuilder;
-    private RestTemplateBuilder templateBuilder;
 
     public ProductServiceImpl(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplateBuilder = restTemplateBuilder;
     }
 
-    private Product convertProductDtoToProduct(ProductDto productDto) {
+    private Product convertProductDtoToProductModel(ProductDto productDto) {
         Product product = new Product();
         product.setId(productDto.getId());
         product.setTitle(productDto.getTitle());
@@ -48,27 +47,24 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> getAllProducts() {
-        templateBuilder = new RestTemplateBuilder();
-        ResponseEntity<ProductDto[]> products = templateBuilder.build().getForEntity("https://fakestoreapi.com/products", ProductDto[].class);
+        ResponseEntity<ProductDto[]> products = restTemplateBuilder.build().getForEntity("https://fakestoreapi.com/products", ProductDto[].class);
         List<Product> productList = new ArrayList<>();
         for (ProductDto pr : products.getBody()) {
-            productList.add(convertProductDtoToProduct(pr));
+            productList.add(convertProductDtoToProductModel(pr));
         }
         return productList;
     }
 
     @Override
     public Product getSingleProduct(Long productID) {
-        templateBuilder = new RestTemplateBuilder();
-        ResponseEntity<ProductDto> product = templateBuilder.build().getForEntity("https://fakestoreapi.com/products/{id}", ProductDto.class, productID);
-        return convertProductDtoToProduct(product.getBody());
+        ResponseEntity<ProductDto> product = restTemplateBuilder.build().getForEntity("https://fakestoreapi.com/products/{id}", ProductDto.class, productID);
+        return convertProductDtoToProductModel(product.getBody());
     }
 
     @Override
     public Product addNewProduct(ProductDto productDto) {
-        templateBuilder = new RestTemplateBuilder();
-        ResponseEntity<ProductDto> product = templateBuilder.build().postForEntity("https://fakestoreapi.com/products", productDto, ProductDto.class);
-        return convertProductDtoToProduct(product.getBody());
+        ResponseEntity<ProductDto> product = restTemplateBuilder.build().postForEntity("https://fakestoreapi.com/products", productDto, ProductDto.class);
+        return convertProductDtoToProductModel(product.getBody());
     }
 
     @Override
@@ -80,19 +76,19 @@ public class ProductServiceImpl implements ProductService {
                 ProductDto.class,
                 productID
         );
-        return convertProductDtoToProduct(product.getBody());
+        return convertProductDtoToProductModel(product.getBody());
     }
 
     @Override
     public Product replaceSingleProduct(Long productID, ProductDto productDto) {
         ResponseEntity<ProductDto> product = requestForEntity(HttpMethod.PUT, "https://fakestoreapi.com/products/{id}", productDto, ProductDto.class, productID);
-        return convertProductDtoToProduct(product.getBody());
+        return convertProductDtoToProductModel(product.getBody());
     }
 
     @Override
     public Product deleteSingleProduct(Long productID) {
         ResponseEntity<ProductDto> product = requestForEntity(HttpMethod.DELETE, "https://fakestoreapi.com/products/{id}", null, ProductDto.class, productID);
-        Product product1 = convertProductDtoToProduct(product.getBody());
+        Product product1 = convertProductDtoToProductModel(product.getBody());
         product1.setDeleted(true);
         return product1;
     }
