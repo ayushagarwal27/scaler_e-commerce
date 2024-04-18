@@ -1,13 +1,16 @@
 package org.example.scaler_e_commerce.controllers;
 
 import org.example.scaler_e_commerce.dtos.ProductDto;
+import org.example.scaler_e_commerce.models.Product;
 import org.example.scaler_e_commerce.services.ProductService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    private ProductService productService;
+    private final ProductService productService;
 
     ProductController(ProductService productService) {
         this.productService = productService;
@@ -15,31 +18,35 @@ public class ProductController {
 
 
     @GetMapping()
-    public ProductDto[] getAllProducts() {
-        ProductDto[] products = productService.getAllProducts();
+    public List<Product> getAllProducts() {
+        List<Product> products = productService.getAllProducts();
         return products;
     }
 
     @GetMapping("/{productID}")
-    public ProductDto getSingleProduct(@PathVariable("productID") Long productID) {
-        ProductDto product = productService.getSingleProduct(productID);
-        return product;
+    public Product getSingleProduct(@PathVariable("productID") Long productID) {
+        return productService.getSingleProduct(productID);
     }
 
     @PostMapping()
-    public ProductDto addSingleProduct(@RequestBody ProductDto productDto) {
-        ProductDto product = productService.addSingleProduct(productDto);
+    public Product addSingleProduct(@RequestBody ProductDto productDto) {
+        Product product = productService.addNewProduct(productDto);
         return product;
     }
 
 
-    @PutMapping("/{productID}")
-    public String updateSingleProduct(@PathVariable("productID") Long productID, @RequestBody ProductDto productDto) {
+    @PatchMapping("/{productID}")
+    public Product updateSingleProduct(@PathVariable("productID") Long productID, @RequestBody ProductDto productDto) {
         return productService.updateSingleProduct(productID, productDto);
     }
 
+    @PutMapping("/{productID}")
+    public Product replaceSingleProduct(@PathVariable("productID") Long productID, @RequestBody ProductDto productDto) {
+        return productService.replaceSingleProduct(productID, productDto);
+    }
+
     @DeleteMapping("/{productID}")
-    public String deleteSingleProduct(@PathVariable("productID") Long productID) {
+    public Product deleteSingleProduct(@PathVariable("productID") Long productID) {
         return productService.deleteSingleProduct(productID);
     }
 }

@@ -1,15 +1,20 @@
 package org.example.scaler_e_commerce.services;
 
 import org.example.scaler_e_commerce.dtos.ProductDto;
+import org.example.scaler_e_commerce.models.Product;
+
+import java.util.List;
 
 public interface ProductService {
-    ProductDto[] getAllProducts();
+    List<Product> getAllProducts();
 
-    ProductDto getSingleProduct(Long productID);
+    Product getSingleProduct(Long productID);
 
-    ProductDto addSingleProduct(ProductDto productDto);
+    Product addNewProduct(ProductDto productDto);
 
-    String updateSingleProduct(Long productID, ProductDto productDto);
+    Product updateSingleProduct(Long productID, ProductDto productDto);
 
-    String deleteSingleProduct(Long productID);
+    Product replaceSingleProduct(Long productID, ProductDto productDto);
+
+    Product deleteSingleProduct(Long productID);
 }

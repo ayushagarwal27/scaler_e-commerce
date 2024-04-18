@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/products/categories")
 public class CategoryController {
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
     CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
