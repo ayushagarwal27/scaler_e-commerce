@@ -1,9 +1,9 @@
 package org.example.scaler_e_commerce.services;
 
+import org.example.scaler_e_commerce.clients.StoreCategoryClient;
 import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.models.Category;
 import org.example.scaler_e_commerce.models.Product;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +13,10 @@ import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
-    private final RestTemplateBuilder templateBuilder;
+    StoreCategoryClient storeCategoryClient;
 
-    CategoryServiceImpl(RestTemplateBuilder templateBuilder) {
-        this.templateBuilder = new RestTemplateBuilder();
+    CategoryServiceImpl(StoreCategoryClient storeCategoryClient) {
+        this.storeCategoryClient = storeCategoryClient;
     }
 
     private Category convertResponseCategoryToCategoryModel(String cate) {
@@ -40,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Optional<List<Category>> getAllCategories() {
-        ResponseEntity<String[]> categoriesResponse = templateBuilder.build().getForEntity("https://fakestoreapi.com/products/categories", String[].class);
+        ResponseEntity<String[]> categoriesResponse = storeCategoryClient.getAllCategories();
         List<Category> categoryList = new ArrayList<>();
         if (categoriesResponse.getBody() == null) {
             return Optional.empty();
@@ -53,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Optional<List<Product>> getAllProductsByCategory(String categoryName) {
-        ResponseEntity<ProductDto[]> productResponse = templateBuilder.build().getForEntity("https://fakestoreapi.com/products/category/{categoryName}", ProductDto[].class, categoryName);
+        ResponseEntity<ProductDto[]> productResponse = storeCategoryClient.getAllProductsByCategory(categoryName);
         List<Product> productList = new ArrayList<>();
         if (productResponse.getBody() == null) {
             return Optional.empty();

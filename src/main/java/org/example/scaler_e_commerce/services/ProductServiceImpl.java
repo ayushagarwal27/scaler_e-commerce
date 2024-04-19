@@ -1,18 +1,11 @@
 package org.example.scaler_e_commerce.services;
 
+import org.example.scaler_e_commerce.clients.StoreProductClient;
 import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.models.Category;
 import org.example.scaler_e_commerce.models.Product;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +13,10 @@ import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-    private final RestTemplateBuilder restTemplateBuilder;
+    StoreProductClient storeProductClient;
 
-    public ProductServiceImpl(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplateBuilder = restTemplateBuilder;
+    ProductServiceImpl(StoreProductClient storeProductClient) {
+        this.storeProductClient = storeProductClient;
     }
 
     private Product convertProductDtoToProductModel(ProductDto productDto) {
@@ -39,16 +32,10 @@ public class ProductServiceImpl implements ProductService {
         return product;
     }
 
-    public <T> ResponseEntity<T> requestForEntity(HttpMethod httpMethod, String url, @Nullable Object request, Class<T> responseType, Object... uriVariables) throws RestClientException {
-        RestTemplate restTemplate = restTemplateBuilder.requestFactory(HttpComponentsClientHttpRequestFactory.class).build();
-        RequestCallback requestCallback = restTemplate.httpEntityCallback(request, responseType);
-        ResponseExtractor<ResponseEntity<T>> responseExtractor = restTemplate.responseEntityExtractor(responseType);
-        return restTemplate.execute(url, httpMethod, requestCallback, responseExtractor, uriVariables);
-    }
 
     @Override
     public Optional<List<Product>> getAllProducts() {
-        ResponseEntity<ProductDto[]> products = restTemplateBuilder.build().getForEntity("https://fakestoreapi.com/products", ProductDto[].class);
+        ResponseEntity<ProductDto[]> products = storeProductClient.getAllProducts();
         List<Product> productList = new ArrayList<>();
         if (products.getBody() == null) {
             return Optional.empty();
@@ -61,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Optional<Product> getSingleProduct(Long productID) {
-        ResponseEntity<ProductDto> product = restTemplateBuilder.build().getForEntity("https://fakestoreapi.com/products/{id}", ProductDto.class, productID);
+        ResponseEntity<ProductDto> product = storeProductClient.getSingleProduct(productID);
 
         if (product.getBody() == null) {
             return Optional.empty();
@@ -71,20 +58,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product addNewProduct(ProductDto productDto) {
-        ResponseEntity<ProductDto> product = restTemplateBuilder.build().postForEntity("https://fakestoreapi.com/products", productDto, ProductDto.class);
-
+        ResponseEntity<ProductDto> product = storeProductClient.addNewProduct(productDto);
         return convertProductDtoToProductModel(product.getBody());
     }
 
     @Override
     public Optional<Product> updateSingleProduct(Long productID, ProductDto productDto) {
-        ResponseEntity<ProductDto> product = requestForEntity(
-                HttpMethod.PATCH,
-                "https://fakestoreapi.com/products/{id}",
-                productDto,
-                ProductDto.class,
-                productID
-        );
+        ResponseEntity<ProductDto> product = storeProductClient.updateSingleProduct(productID, productDto);
         if (product.getBody() == null) {
             return Optional.empty();
         }
@@ -93,7 +73,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Optional<Product> replaceSingleProduct(Long productID, ProductDto productDto) {
-        ResponseEntity<ProductDto> product = requestForEntity(HttpMethod.PUT, "https://fakestoreapi.com/products/{id}", productDto, ProductDto.class, productID);
+        ResponseEntity<ProductDto> product = storeProductClient.replaceSingleProduct(productID, productDto);
         if (product.getBody() == null) {
             return Optional.empty();
         }
@@ -102,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Optional<Product> deleteSingleProduct(Long productID) {
-        ResponseEntity<ProductDto> product = requestForEntity(HttpMethod.DELETE, "https://fakestoreapi.com/products/{id}", null, ProductDto.class, productID);
+        ResponseEntity<ProductDto> product = storeProductClient.deleteSingleProduct(productID);
         if (product.getBody() == null) {
             return Optional.empty();
         }
