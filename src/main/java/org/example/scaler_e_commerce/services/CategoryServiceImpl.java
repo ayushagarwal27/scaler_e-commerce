@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -38,22 +39,28 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getAllCategories() {
+    public Optional<List<Category>> getAllCategories() {
         ResponseEntity<String[]> categoriesResponse = templateBuilder.build().getForEntity("https://fakestoreapi.com/products/categories", String[].class);
         List<Category> categoryList = new ArrayList<>();
+        if (categoriesResponse.getBody() == null) {
+            return Optional.empty();
+        }
         for (String cate : categoriesResponse.getBody()) {
             categoryList.add(convertResponseCategoryToCategoryModel(cate));
         }
-        return categoryList;
+        return Optional.of(categoryList);
     }
 
     @Override
-    public List<Product> getAllProductsByCategory(String categoryName) {
+    public Optional<List<Product>> getAllProductsByCategory(String categoryName) {
         ResponseEntity<ProductDto[]> productResponse = templateBuilder.build().getForEntity("https://fakestoreapi.com/products/category/{categoryName}", ProductDto[].class, categoryName);
         List<Product> productList = new ArrayList<>();
+        if (productResponse.getBody() == null) {
+            return Optional.empty();
+        }
         for (ProductDto pr : productResponse.getBody()) {
             productList.add(convertProductDtoToProductModel(pr));
         }
-        return productList;
+        return Optional.of(productList);
     }
 }

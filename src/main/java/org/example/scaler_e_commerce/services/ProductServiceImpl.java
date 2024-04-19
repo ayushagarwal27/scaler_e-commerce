@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -46,29 +47,37 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProducts() {
+    public Optional<List<Product>> getAllProducts() {
         ResponseEntity<ProductDto[]> products = restTemplateBuilder.build().getForEntity("https://fakestoreapi.com/products", ProductDto[].class);
         List<Product> productList = new ArrayList<>();
+        if (products.getBody() == null) {
+            return Optional.empty();
+        }
         for (ProductDto pr : products.getBody()) {
             productList.add(convertProductDtoToProductModel(pr));
         }
-        return productList;
+        return Optional.of(productList);
     }
 
     @Override
-    public Product getSingleProduct(Long productID) {
+    public Optional<Product> getSingleProduct(Long productID) {
         ResponseEntity<ProductDto> product = restTemplateBuilder.build().getForEntity("https://fakestoreapi.com/products/{id}", ProductDto.class, productID);
-        return convertProductDtoToProductModel(product.getBody());
+
+        if (product.getBody() == null) {
+            return Optional.empty();
+        }
+        return Optional.of(convertProductDtoToProductModel(product.getBody()));
     }
 
     @Override
     public Product addNewProduct(ProductDto productDto) {
         ResponseEntity<ProductDto> product = restTemplateBuilder.build().postForEntity("https://fakestoreapi.com/products", productDto, ProductDto.class);
+
         return convertProductDtoToProductModel(product.getBody());
     }
 
     @Override
-    public Product updateSingleProduct(Long productID, ProductDto productDto) {
+    public Optional<Product> updateSingleProduct(Long productID, ProductDto productDto) {
         ResponseEntity<ProductDto> product = requestForEntity(
                 HttpMethod.PATCH,
                 "https://fakestoreapi.com/products/{id}",
@@ -76,20 +85,30 @@ public class ProductServiceImpl implements ProductService {
                 ProductDto.class,
                 productID
         );
-        return convertProductDtoToProductModel(product.getBody());
+        if (product.getBody() == null) {
+            return Optional.empty();
+        }
+        return Optional.of(convertProductDtoToProductModel(product.getBody()));
     }
 
     @Override
-    public Product replaceSingleProduct(Long productID, ProductDto productDto) {
+    public Optional<Product> replaceSingleProduct(Long productID, ProductDto productDto) {
         ResponseEntity<ProductDto> product = requestForEntity(HttpMethod.PUT, "https://fakestoreapi.com/products/{id}", productDto, ProductDto.class, productID);
-        return convertProductDtoToProductModel(product.getBody());
+        if (product.getBody() == null) {
+            return Optional.empty();
+        }
+        return Optional.of(convertProductDtoToProductModel(product.getBody()));
     }
 
     @Override
-    public Product deleteSingleProduct(Long productID) {
+    public Optional<Product> deleteSingleProduct(Long productID) {
         ResponseEntity<ProductDto> product = requestForEntity(HttpMethod.DELETE, "https://fakestoreapi.com/products/{id}", null, ProductDto.class, productID);
+        if (product.getBody() == null) {
+            return Optional.empty();
+        }
+
         Product product1 = convertProductDtoToProductModel(product.getBody());
         product1.setDeleted(true);
-        return product1;
+        return Optional.of(convertProductDtoToProductModel(product.getBody()));
     }
 }

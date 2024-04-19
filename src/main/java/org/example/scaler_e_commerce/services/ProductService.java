@@ -4,17 +4,18 @@ import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.models.Product;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductService {
-    List<Product> getAllProducts();
+    Optional<List<Product>> getAllProducts();
 
-    Product getSingleProduct(Long productID);
+    Optional<Product> getSingleProduct(Long productID);
 
     Product addNewProduct(ProductDto productDto);
 
-    Product updateSingleProduct(Long productID, ProductDto productDto);
+    Optional<Product> updateSingleProduct(Long productID, ProductDto productDto);
 
-    Product replaceSingleProduct(Long productID, ProductDto productDto);
+    Optional<Product> replaceSingleProduct(Long productID, ProductDto productDto);
 
-    Product deleteSingleProduct(Long productID);
+    Optional<Product> deleteSingleProduct(Long productID);
 }
