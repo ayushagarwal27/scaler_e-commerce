@@ -4,6 +4,7 @@ import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.exceptions.NotFoundException;
 import org.example.scaler_e_commerce.models.Product;
 import org.example.scaler_e_commerce.services.ProductService;
+import org.example.scaler_e_commerce.services.SelfProductService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,9 +14,11 @@ import java.util.Optional;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
+    private final SelfProductService selfProductService;
 
-    ProductController(ProductService productService) {
+    ProductController(ProductService productService, SelfProductService selfProductService) {
         this.productService = productService;
+        this.selfProductService = selfProductService;
     }
 
 
@@ -30,7 +33,7 @@ public class ProductController {
 
     @GetMapping("/{productID}")
     public Product getSingleProduct(@PathVariable("productID") Long productID) throws NotFoundException {
-        Optional<Product> productOptional = productService.getSingleProduct(productID);
+        Optional<Product> productOptional = selfProductService.getSingleProduct(productID);
         if (productOptional.isEmpty()) {
             throw new NotFoundException("Product not found.");
         }
