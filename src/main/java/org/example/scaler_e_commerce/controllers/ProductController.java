@@ -24,8 +24,8 @@ public class ProductController {
 
     @GetMapping()
     public List<Product> getAllProducts() throws NotFoundException {
-        Optional<List<Product>> productListOptional = productService.getAllProducts();
-        if (productListOptional.isEmpty()) {
+        Optional<List<Product>> productListOptional = selfProductService.getAllProducts();
+        if (productListOptional.get().isEmpty()) {
             throw new NotFoundException("No products found.");
         }
         return productListOptional.get();

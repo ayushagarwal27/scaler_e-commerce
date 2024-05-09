@@ -1,6 +1,7 @@
 package org.example.scaler_e_commerce.services;
 
 import org.example.scaler_e_commerce.clients.StoreCategoryClient;
+import org.example.scaler_e_commerce.dtos.CategoryDto;
 import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.models.Category;
 import org.example.scaler_e_commerce.models.Product;
@@ -62,5 +63,10 @@ public class CategoryServiceImpl implements CategoryService {
             productList.add(convertProductDtoToProductModel(pr));
         }
         return Optional.of(productList);
+    }
+
+    @Override
+    public Optional<Category> addNewCategory(CategoryDto categoryDto) {
+        return Optional.empty();
     }
 }

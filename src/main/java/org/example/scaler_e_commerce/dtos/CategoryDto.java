@@ -8,4 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CategoryDto {
+    private String name;
+    private String description;
+
 }
