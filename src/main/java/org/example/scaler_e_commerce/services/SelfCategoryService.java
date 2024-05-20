@@ -25,7 +25,7 @@ public class SelfCategoryService implements CategoryService {
         List<Category> categoryList = categoryRepository.findAll();
         return Optional.of(categoryList);
     }
-
+ 
     @Override
     public Optional<List<Product>> getAllProductsByCategory(String categoryName) {
         List<Product> productList = productRepository.getProductsByCategoryName(categoryName);

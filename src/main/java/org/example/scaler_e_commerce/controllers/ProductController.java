@@ -3,7 +3,6 @@ package org.example.scaler_e_commerce.controllers;
 import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.exceptions.NotFoundException;
 import org.example.scaler_e_commerce.models.Product;
-import org.example.scaler_e_commerce.services.ProductService;
 import org.example.scaler_e_commerce.services.SelfProductService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +12,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    private final ProductService productService;
     private final SelfProductService selfProductService;
 
-    ProductController(ProductService productService, SelfProductService selfProductService) {
-        this.productService = productService;
+    ProductController(SelfProductService selfProductService) {
         this.selfProductService = selfProductService;
     }
 
@@ -42,13 +39,13 @@ public class ProductController {
 
     @PostMapping()
     public Product addSingleProduct(@RequestBody ProductDto productDto) {
-        return productService.addNewProduct(productDto);
+        return selfProductService.addNewProduct(productDto);
     }
 
 
     @PatchMapping("/{productID}")
     public Product updateSingleProduct(@PathVariable("productID") Long productID, @RequestBody ProductDto productDto) throws NotFoundException {
-        Optional<Product> productOptional = productService.updateSingleProduct(productID, productDto);
+        Optional<Product> productOptional = selfProductService.updateSingleProduct(productID, productDto);
         if (productOptional.isEmpty()) {
             throw new NotFoundException("Product not found.");
         }
@@ -57,7 +54,7 @@ public class ProductController {
 
     @PutMapping("/{productID}")
     public Product replaceSingleProduct(@PathVariable("productID") Long productID, @RequestBody ProductDto productDto) throws NotFoundException {
-        Optional<Product> productOptional = productService.replaceSingleProduct(productID, productDto);
+        Optional<Product> productOptional = selfProductService.replaceSingleProduct(productID, productDto);
         if (productOptional.isEmpty()) {
             throw new NotFoundException("Product not found.");
         }
@@ -66,7 +63,7 @@ public class ProductController {
 
     @DeleteMapping("/{productID}")
     public Product deleteSingleProduct(@PathVariable("productID") Long productID) throws NotFoundException {
-        Optional<Product> productOptional = productService.deleteSingleProduct(productID);
+        Optional<Product> productOptional = selfProductService.deleteSingleProduct(productID);
         if (productOptional.isEmpty()) {
             throw new NotFoundException("Product not found.");
         }
