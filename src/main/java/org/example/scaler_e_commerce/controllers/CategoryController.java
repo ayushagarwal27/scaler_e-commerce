@@ -5,6 +5,8 @@ import org.example.scaler_e_commerce.exceptions.NotFoundException;
 import org.example.scaler_e_commerce.models.Category;
 import org.example.scaler_e_commerce.models.Product;
 import org.example.scaler_e_commerce.services.SelfCategoryService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,24 +23,24 @@ public class CategoryController {
     }
 
     @GetMapping()
-    public List<Category> getAllCategories() {
+    public ResponseEntity<List<Category>> getAllCategories() {
         Optional<List<Category>> categoryListOptional = selfCategoryService.getAllCategories();
-        return categoryListOptional.get();
+        return ResponseEntity.ok(categoryListOptional.get());
     }
 
     @GetMapping("/{categoryName}")
-    public List<Product> getAllProductsByCategory(@PathVariable("categoryName") String categoryName) throws NotFoundException {
+    public ResponseEntity<List<Product>> getAllProductsByCategory(@PathVariable("categoryName") String categoryName) throws NotFoundException {
         Optional<List<Product>> productListOptional = selfCategoryService.getAllProductsByCategory(categoryName);
         if (productListOptional.isEmpty()) {
             throw new NotFoundException("Product with given category not found");
         }
-        return productListOptional.get();
+        return ResponseEntity.ok(productListOptional.get());
     }
 
     @PostMapping()
-    public Category addNewCategory(@RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<Category> addNewCategory(@RequestBody CategoryDto categoryDto) {
         Optional<Category> optionalCategory = selfCategoryService.addNewCategory(categoryDto);
-        return optionalCategory.get();
+        return ResponseEntity.status(HttpStatus.OK).body(optionalCategory.get());
     }
 
 }
