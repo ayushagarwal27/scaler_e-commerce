@@ -1,6 +1,6 @@
 package org.example.scaler_e_commerce.services;
 
-import org.example.scaler_e_commerce.clients.StoreProductClient;
+import org.example.scaler_e_commerce.clients.fakeStoreApi.StoreProductClient;
 import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.models.Category;
 import org.example.scaler_e_commerce.models.Product;

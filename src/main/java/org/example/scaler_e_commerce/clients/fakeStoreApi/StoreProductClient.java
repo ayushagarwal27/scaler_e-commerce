@@ -1,4 +1,4 @@
-package org.example.scaler_e_commerce.clients;
+package org.example.scaler_e_commerce.clients.fakeStoreApi;
 
 import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.springframework.boot.web.client.RestTemplateBuilder;

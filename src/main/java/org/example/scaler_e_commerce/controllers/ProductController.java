@@ -1,11 +1,16 @@
 package org.example.scaler_e_commerce.controllers;
 
+import org.example.scaler_e_commerce.authenticationClient.AuthenticationClient;
+import org.example.scaler_e_commerce.authenticationClient.dtos.RoleDto;
+import org.example.scaler_e_commerce.authenticationClient.dtos.SessionStatus;
+import org.example.scaler_e_commerce.authenticationClient.dtos.ValidateResponseDto;
 import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.exceptions.NotFoundException;
 import org.example.scaler_e_commerce.models.Product;
 import org.example.scaler_e_commerce.services.SelfProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,14 +20,41 @@ import java.util.Optional;
 @RequestMapping("/products")
 public class ProductController {
     private final SelfProductService selfProductService;
+    private final AuthenticationClient authenticationClient;
 
-    ProductController(SelfProductService selfProductService) {
+    ProductController(SelfProductService selfProductService, AuthenticationClient authenticationClient) {
         this.selfProductService = selfProductService;
+        this.authenticationClient = authenticationClient;
     }
 
 
     @GetMapping()
-    public ResponseEntity<List<Product>> getAllProducts() throws NotFoundException {
+    public ResponseEntity<List<Product>> getAllProducts(@Nullable @RequestHeader("AUTH_TOKEN") String token) throws NotFoundException {
+
+//        Check if token exits
+        if (token == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        ValidateResponseDto response = authenticationClient.validate(token);
+
+//        Check if token is valid
+        if (response.getSessionStatus().equals(SessionStatus.INVALID)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+//        check if user has permission
+
+        boolean isAdmin = false;
+        for (RoleDto role : response.getUserDto().getRoles()) {
+            if (role.getName().equals("ADMIN")) {
+                isAdmin = true;
+            }
+        }
+
+        if (!isAdmin) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         Optional<List<Product>> productListOptional = selfProductService.getAllProducts();
         if (productListOptional.get().isEmpty()) {
             throw new NotFoundException("No products found.");
