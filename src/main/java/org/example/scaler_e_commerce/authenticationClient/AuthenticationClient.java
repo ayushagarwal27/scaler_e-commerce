@@ -2,6 +2,7 @@ package org.example.scaler_e_commerce.authenticationClient;
 
 import org.example.scaler_e_commerce.authenticationClient.dtos.ValidateResponseDto;
 import org.example.scaler_e_commerce.authenticationClient.dtos.ValidateTokenRequestDto;
+import org.example.scaler_e_commerce.config.CustomProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,13 @@ public class AuthenticationClient {
 
     private final RestTemplateBuilder restTemplateBuilder;
 
-    public AuthenticationClient(RestTemplateBuilder restTemplateBuilder) {
+    private final CustomProperties customProperties;
+
+
+    public AuthenticationClient(RestTemplateBuilder restTemplateBuilder, CustomProperties customProperties) {
         this.restTemplateBuilder = restTemplateBuilder;
 
+        this.customProperties = customProperties;
     }
 
 
@@ -22,7 +27,7 @@ public class AuthenticationClient {
         RestTemplate restTemplate = restTemplateBuilder.build();
         ValidateTokenRequestDto validateTokenRequestDto = new ValidateTokenRequestDto();
         validateTokenRequestDto.setToken(token);
-        ResponseEntity<ValidateResponseDto> request = restTemplate.postForEntity("http://localhost:9000/auth/validate", validateTokenRequestDto, ValidateResponseDto.class);
+        ResponseEntity<ValidateResponseDto> request = restTemplate.postForEntity(customProperties.getUserserviceUrl() + "/auth/validate", validateTokenRequestDto, ValidateResponseDto.class);
         return request.getBody();
     }
 }
