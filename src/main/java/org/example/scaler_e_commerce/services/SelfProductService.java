@@ -5,14 +5,12 @@ import org.example.scaler_e_commerce.models.Category;
 import org.example.scaler_e_commerce.models.Product;
 import org.example.scaler_e_commerce.repositories.CategoryRepository;
 import org.example.scaler_e_commerce.repositories.ProductRepository;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@Primary
 public class SelfProductService implements ProductService {
     ProductRepository productRepository;
     CategoryRepository categoryRepository;

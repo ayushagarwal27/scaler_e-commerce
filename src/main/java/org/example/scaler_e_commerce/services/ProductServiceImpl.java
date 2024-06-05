@@ -4,16 +4,21 @@ import org.example.scaler_e_commerce.clients.fakeStoreApi.StoreProductClient;
 import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.models.Category;
 import org.example.scaler_e_commerce.models.Product;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Primary
 public class ProductServiceImpl implements ProductService {
     StoreProductClient storeProductClient;
+    //    In memory cache
+    HashMap<Long, Product> productMap = new HashMap<>();
 
     ProductServiceImpl(StoreProductClient storeProductClient) {
         this.storeProductClient = storeProductClient;
@@ -48,12 +53,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Optional<Product> getSingleProduct(Long productID) {
+        if (productMap.containsKey(productID)) {
+            return Optional.of(productMap.get(productID));
+        }
         ResponseEntity<ProductDto> product = storeProductClient.getSingleProduct(productID);
 
         if (product.getBody() == null) {
             return Optional.empty();
         }
-        return Optional.of(convertProductDtoToProductModel(product.getBody()));
+        Product productRes = convertProductDtoToProductModel(product.getBody());
+        productMap.put(productRes.getId(), productRes);
+        return Optional.of(productRes);
     }
 
     @Override
