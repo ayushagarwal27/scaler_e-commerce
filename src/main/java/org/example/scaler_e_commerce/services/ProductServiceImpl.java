@@ -5,6 +5,7 @@ import org.example.scaler_e_commerce.dtos.ProductDto;
 import org.example.scaler_e_commerce.models.Category;
 import org.example.scaler_e_commerce.models.Product;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +17,15 @@ import java.util.Optional;
 @Service
 @Primary
 public class ProductServiceImpl implements ProductService {
-    StoreProductClient storeProductClient;
+    private final StoreProductClient storeProductClient;
+    private final RedisTemplate<Long, Object> redisTemplate;
+
     //    In memory cache
     HashMap<Long, Product> productMap = new HashMap<>();
 
-    ProductServiceImpl(StoreProductClient storeProductClient) {
+    ProductServiceImpl(StoreProductClient storeProductClient, RedisTemplate redisTemplate) {
         this.storeProductClient = storeProductClient;
+        this.redisTemplate = redisTemplate;
     }
 
     private Product convertProductDtoToProductModel(ProductDto productDto) {
@@ -53,16 +57,23 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Optional<Product> getSingleProduct(Long productID) {
-        if (productMap.containsKey(productID)) {
-            return Optional.of(productMap.get(productID));
+//        if (productMap.containsKey(productID)) {
+//            return Optional.of(productMap.get(productID));
+//        }
+
+        Product productRedis = (Product) redisTemplate.opsForHash().get(productID, "PRODUCTS");
+        if (productRedis != null) {
+            return Optional.of(productRedis);
         }
+
         ResponseEntity<ProductDto> product = storeProductClient.getSingleProduct(productID);
 
         if (product.getBody() == null) {
             return Optional.empty();
         }
         Product productRes = convertProductDtoToProductModel(product.getBody());
-        productMap.put(productRes.getId(), productRes);
+//        productMap.put(productRes.getId(), productRes);
+        redisTemplate.opsForHash().put(productID, "PRODUCTS", productRes);
         return Optional.of(productRes);
     }
 
